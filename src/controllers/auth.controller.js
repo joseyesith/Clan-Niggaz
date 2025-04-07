@@ -4,33 +4,31 @@ import bcrypt from "bcryptjs";
 import { TOKEN_SECRET } from "../config.js";
 import { createAccessToken } from "../libs/jwt.js";
 
+
 export const register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
     const userFound = await User.findOne({ email });
-
     if (userFound)
       return res.status(400).json({
         message: ["The email is already in use"],
       });
 
-    // hashing the password
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // creating the user
     const newUser = new User({
       username,
       email,
       password: passwordHash,
     });
 
-    // saving the user in the database
     const userSaved = await newUser.save();
 
-    // create access token
     const token = await createAccessToken({
       id: userSaved._id,
+      username: userSaved.username,
+      role: userSaved.role,
     });
 
     res.cookie("token", token, {
@@ -40,14 +38,19 @@ export const register = async (req, res) => {
     });
 
     res.json({
-      id: userSaved._id,
-      username: userSaved.username,
-      email: userSaved.email,
+      token,
+      user: {
+        id: userSaved._id,
+        username: userSaved.username,
+        email: userSaved.email,
+        role: userSaved.role,
+      },
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+   
 
 export const login = async (req, res) => {
   try {
@@ -69,6 +72,7 @@ export const login = async (req, res) => {
     const token = await createAccessToken({
       id: userFound._id,
       username: userFound.username,
+      role: userFound.role,
     });
 
     res.cookie("token", token, {
@@ -78,14 +82,19 @@ export const login = async (req, res) => {
     });
 
     res.json({
-      id: userFound._id,
-      username: userFound.username,
-      email: userFound.email,
+      token,
+      user: {
+        id: userFound._id,
+        username: userFound.username,
+        email: userFound.email,
+        role: userFound.role,
+      },
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
+
 
 export const verifyToken = async (req, res) => {
   const { token } = req.cookies;
@@ -101,9 +110,11 @@ export const verifyToken = async (req, res) => {
       id: userFound._id,
       username: userFound.username,
       email: userFound.email,
+      role: userFound.role,
     });
   });
 };
+
 
 export const logout = async (req, res) => {
   res.cookie("token", "", {

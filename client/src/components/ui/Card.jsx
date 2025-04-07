@@ -1,3 +1,8 @@
-export function Card({ children }) {
-  return <div className="bg-zinc-800 max-w-md w-full p-10 rounded-md">{children}</div>;
-}
+
+export const Card = ({ children }) => (
+  <div className="rounded-2xl shadow-md p-4 bg-white">{children}</div>
+);
+
+export const CardContent = ({ children }) => (
+  <div className="mt-2">{children}</div>
+);

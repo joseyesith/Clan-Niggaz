@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // clear errors after 5 seconds
+  // Limpiar errores después de 5 segundos
   useEffect(() => {
     if (errors.length > 0) {
       const timer = setTimeout(() => {
@@ -43,11 +43,10 @@ export const AuthProvider = ({ children }) => {
   const signin = async (user) => {
     try {
       const res = await loginRequest(user);
-      setUser(res.data);
+      setUser(res.data.user); // Asegúrate de que sea user aquí
       setIsAuthenticated(true);
     } catch (error) {
       console.log(error);
-      // setErrors(error.response.data.message);
     }
   };
 
@@ -68,7 +67,6 @@ export const AuthProvider = ({ children }) => {
 
       try {
         const res = await verifyTokenRequest(cookies.token);
-        console.log(res);
         if (!res.data) return setIsAuthenticated(false);
         setIsAuthenticated(true);
         setUser(res.data);
@@ -91,6 +89,7 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated,
         errors,
         loading,
+        isAdmin: user?.role === "admin", //  Aquí se verifica el rol
       }}
     >
       {children}

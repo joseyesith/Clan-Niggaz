@@ -2,7 +2,7 @@ import Task from "../models/task.model.js";
 
 export const getTasks = async (req, res) => {
   try {
-    const tasks = await Task.find({ user : req.user.id }).populate("user");
+    const tasks = await Task.find({ user: req.user.id }).populate("user");
     res.json(tasks);
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -11,13 +11,33 @@ export const getTasks = async (req, res) => {
 
 export const createTask = async (req, res) => {
   try {
-    const { title, description, date } = req.body;
+    const {
+      title,
+      description,
+      date,
+      clientName,
+      phone,
+      startTime,
+      duration,
+      serviceType,
+      techAssistance,
+      notes,
+    } = req.body;
+
     const newTask = new Task({
       title,
       description,
       date,
+      clientName,
+      phone,
+      startTime,
+      duration,
+      serviceType,
+      techAssistance,
+      notes,
       user: req.user.id,
     });
+
     await newTask.save();
     res.json(newTask);
   } catch (error) {
@@ -39,12 +59,36 @@ export const deleteTask = async (req, res) => {
 
 export const updateTask = async (req, res) => {
   try {
-    const { title, description, date } = req.body;
+    const {
+      title,
+      description,
+      date,
+      clientName,
+      phone,
+      startTime,
+      duration,
+      serviceType,
+      techAssistance,
+      notes,
+    } = req.body;
+
     const taskUpdated = await Task.findOneAndUpdate(
       { _id: req.params.id },
-      { title, description, date },
+      {
+        title,
+        description,
+        date,
+        clientName,
+        phone,
+        startTime,
+        duration,
+        serviceType,
+        techAssistance,
+        notes,
+      },
       { new: true }
     );
+
     return res.json(taskUpdated);
   } catch (error) {
     return res.status(500).json({ message: error.message });
